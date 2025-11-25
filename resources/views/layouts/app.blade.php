@@ -23,17 +23,17 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar collapsed">
             <div class="sidebar-header">
-                <div class="logo">
+                <a href="{{ route('dashboard') }}" class="logo">
                     <img src="{{ asset('images/logo-stti.png') }}" alt="STTI Logo" class="logo-img">
                     <span class="logo-text">Inventaris STTI</span>
-                </div>
+                </a>
             </div>
 
             <nav class="sidebar-nav">
                 @php
                     $permissions = [
-                        'Admin' => ['dashboard', 'assets', 'borrowing', 'maintenance', 'users', 'requests', 'reports', 'qrCode'],
-                        'Sarpras' => ['dashboard', 'assets', 'borrowing', 'maintenance', 'reports', 'qrCode'],
+                        'Admin' => ['dashboard', 'assets-inv', 'borrowing', 'maintenance', 'users', 'requests', 'reports', 'qrCode'],
+                        'Sarpras' => ['dashboard', 'assets-inv', 'borrowing', 'maintenance', 'reports', 'qrCode'],
                         'Rektor' => ['dashboard', 'reports'],
                         'Kaprodi' => ['dashboard', 'requests', 'reports'],
                         'Keuangan' => ['dashboard', 'requests', 'reports'],
@@ -54,12 +54,11 @@
                     </a>
                 @endif
 
-                @if(in_array('assets', $userPermissions))
+                @if(in_array('assets-inv', $userPermissions))
                     <a href="{{ route('assets-inv.index') }}"
                         class="nav-link {{ request()->routeIs('assets-inv.*') ? 'active' : '' }}" data-page="assets">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path
-                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                             <polyline points="3.27,6.96 12,12.01 20.73,6.96" />
                             <line x1="12" y1="22.08" x2="12" y2="12" />
                         </svg>
@@ -81,8 +80,7 @@
                     <a href="{{ route('maintenances.index') }}"
                         class="nav-link {{ request()->routeIs('maintenances.*') ? 'active' : '' }}" data-page="maintenance">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path
-                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                         </svg>
                         <span>Pemeliharaan</span>
                     </a>
@@ -132,10 +130,13 @@
                     <a href="{{ route('qrcodes.index') }}"
                         class="nav-link {{ request()->routeIs('qrcodes.*') ? 'active' : '' }}" data-page="qrCode">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7" />
-                            <rect x="14" y="3" width="7" height="7" />
-                            <rect x="3" y="14" width="7" height="7" />
-                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                            <rect x="14" y="14" width="3" height="3" />
+                            <rect x="18" y="14" width="3" height="3" />
+                            <rect x="14" y="18" width="3" height="3" />
+                            <rect x="18" y="18" width="3" height="3" />
                         </svg>
                         <span>Manajemen QR Code</span>
                     </a>
@@ -148,21 +149,18 @@
             <!-- Navbar -->
             <nav class="navbar">
                 <div class="navbar-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="6" x2="
-                            <svg width=" 20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
                         </svg>
                     </button>
                     <span class="navbar-brand" id="pageTitle">@yield('page-title', 'Dashboard')</span>
                 </div>
                 <div class="navbar-nav">
-                    <button class="btn btn-secondary" onclick="toggleDarkMode()" id="darkModeBtn">
+                    <button class="btn btn-secondary" onclick="toggleDarkMode()" id="darkModeBtn" aria-label="Toggle Dark Mode">
                         <span id="darkModeToggleIcon">🌙</span>
                     </button>
                     <div class="user-profile">
@@ -184,13 +182,13 @@
             <div class="content-area">
                 <!-- Flash Messages -->
                 @if(session('success'))
-                    <div class="alert alert-success" id="flashMessage">
+                    <div class="alert alert-success" id="flashMessage" style="margin-bottom: 1rem; padding: 1rem; background: #d1fae5; color: #065f46; border-radius: 8px; border-left: 4px solid #10b981;">
                         {{ session('success') }}
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-error" id="flashMessage">
+                    <div class="alert alert-error" id="flashMessage" style="margin-bottom: 1rem; padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; border-left: 4px solid #ef4444;">
                         {{ session('error') }}
                     </div>
                 @endif
@@ -199,7 +197,7 @@
             </div>
 
             <!-- Footer -->
-            <footer class="footer">
+            <footer class="footer footer--dashboard">
                 <div class="footer-content">
                     <div class="footer-section">
                         <div class="footer-logo">
@@ -210,8 +208,7 @@
                             </div>
                         </div>
                         <p class="footer-description">
-                            Sistem manajemen inventaris terintegrasi untuk pengelolaan aset kampus yang efisien dan
-                            modern.
+                            Sistem manajemen inventaris terintegrasi untuk pengelolaan aset kampus yang efisien dan modern.
                         </p>
                     </div>
 
@@ -289,6 +286,11 @@
         <div class="overlay" id="overlay"></div>
     </div>
 
+    <!-- Scroll Hint -->
+    <div class="scroll-hint" id="scrollHint">
+        💡 <strong>Tip:</strong> Gunakan <strong>Shift + Scroll</strong> untuk melihat konten tabel secara horizontal
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-content">
@@ -311,6 +313,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             initializeSidebar();
             initializeFlashMessages();
+            initializeScrollHint();
             updateServerTime();
             setInterval(updateServerTime, 1000);
         });
@@ -412,11 +415,30 @@
             if (flashMessage) {
                 setTimeout(function () {
                     flashMessage.style.opacity = '0';
+                    flashMessage.style.transition = 'opacity 0.3s ease';
                     setTimeout(function () {
                         flashMessage.remove();
                     }, 300);
                 }, 3000);
             }
+        }
+
+        function initializeScrollHint() {
+            const tables = document.querySelectorAll('.table-wrapper, .data-table-container');
+            let hintShown = localStorage.getItem('scrollHintShown');
+
+            tables.forEach(table => {
+                if (table.scrollWidth > table.clientWidth && !hintShown) {
+                    const hint = document.getElementById('scrollHint');
+                    if (hint) {
+                        hint.classList.add('show');
+                        setTimeout(() => {
+                            hint.classList.remove('show');
+                            localStorage.setItem('scrollHintShown', 'true');
+                        }, 5000);
+                    }
+                }
+            });
         }
 
         function showLoading() {

@@ -37,7 +37,10 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('maintenances.show', $maintenance) }}" class="btn btn-secondary">Detail</a>
+                                <div class="action-buttons">
+                                    <a href="{{ route('maintenances.show', $maintenance) }}" class="btn btn-secondary">Detail</a>
+                                    <button class="btn btn-primary" onclick="viewAssetDetail({{ $maintenance->asset_id }})">Detail Aset</button>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -52,4 +55,39 @@
             {{ $maintenances->links() }}
         </div>
     </div>
+
+    <!-- Asset Detail Modal - LETAKKAN DI SINI -->
+    <div id="assetDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detail Aset</h3>
+                <button class="close-modal" onclick="closeModal('assetDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="assetDetailContent">Loading...</div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+function viewAssetDetail(assetId) {
+    document.getElementById('assetDetailModal').classList.add('active');
+    document.getElementById('assetDetailContent').innerHTML = '<p>Memuat data...</p>';
+    
+    fetch(`/maintenances/asset/${assetId}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('assetDetailContent').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('assetDetailContent').innerHTML = '<p style="color: red;">Gagal memuat data aset.</p>';
+        });
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+</script>
+@endpush

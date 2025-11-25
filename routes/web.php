@@ -12,6 +12,9 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Api\AssetDetailController;
 
+Route::get('/maintenances/asset/{id}', [MaintenanceController::class, 'showAssetDetail'])
+    ->name('maintenances.asset.detail');
+
 // Public routes
 Route::get('/', function () {
     return redirect()->route('login');
@@ -32,10 +35,18 @@ Route::middleware(['auth'])->group(function () {
 
     // Assets Management
     Route::middleware(['level:assets-inv'])->group(function () {
-        Route::resource('assets-inv', AssetController::class);
-        Route::post('/assets-inv/generate-qrcode', [AssetController::class, 'generateQrCode'])->name('assets.generate-qrcode');
-        Route::post('/assets-inv/bulk-delete', [AssetController::class, 'bulkDelete'])->name('assets.bulk-delete');
-        Route::post('/assets-inv/export', [AssetController::class, 'export'])->name('assets.export');
+        Route::get('/assets-inv', [AssetController::class, 'index'])->name('assets-inv.index');
+        Route::get('/assets-inv/create', [AssetController::class, 'create'])->name('assets-inv.create');
+        Route::post('/assets-inv', [AssetController::class, 'store'])->name('assets-inv.store');
+        Route::get('/assets-inv/{asset}', [AssetController::class, 'show'])->name('assets-inv.show');
+        Route::get('/assets-inv/{asset}/edit', [AssetController::class, 'edit'])->name('assets-inv.edit');
+        Route::put('/assets-inv/{asset}', [AssetController::class, 'update'])->name('assets-inv.update');
+        Route::delete('/assets-inv/{asset}', [AssetController::class, 'destroy'])->name('assets-inv.destroy');
+
+        // Additional asset routes
+        Route::post('/assets/generate-qrcode', [AssetController::class, 'generateQrCode'])->name('assets.generate-qrcode');
+        Route::post('/assets/bulk-delete', [AssetController::class, 'bulkDelete'])->name('assets.bulk-delete');
+        Route::post('/assets/export', [AssetController::class, 'export'])->name('assets.export');
     });
 
     // Borrowing Management
@@ -71,9 +82,11 @@ Route::middleware(['auth'])->group(function () {
 
     // QR Code Management
     Route::middleware(['level:qrCode'])->group(function () {
-        Route::resource('qrcodes', QrCodeController::class)->only(['index', 'show', 'destroy']);
+        Route::get('/qrcodes', [QrCodeController::class, 'index'])->name('qrcodes.index');
+        Route::get('/qrcodes/export/pdf', [QrCodeController::class, 'exportAllPdf'])->name('qrcodes.export-pdf');
+        Route::get('/qrcodes/{qrCode}', [QrCodeController::class, 'show'])->name('qrcodes.show');
+        Route::delete('/qrcodes/{qrCode}', [QrCodeController::class, 'destroy'])->name('qrcodes.destroy');
         Route::post('/qrcodes/{qrCode}/toggle-status', [QrCodeController::class, 'toggleStatus'])->name('qrcodes.toggle-status');
         Route::get('/qrcodes/{qrCode}/print', [QrCodeController::class, 'print'])->name('qrcodes.print');
-        Route::get('/qrcodes/export/pdf', [QrCodeController::class, 'exportAllPdf'])->name('qrcodes.export-pdf');
     });
 });

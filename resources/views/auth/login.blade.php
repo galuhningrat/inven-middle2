@@ -49,6 +49,27 @@
             </form>
         </div>
     </div>
+
+    <!-- Footer untuk halaman Login -->
+    <footer class="footer footer--login">
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="copyright">
+                    © {{ date('Y') }} STTI - Sekolah Tinggi Teknologi Indonesia Cirebon. All rights reserved.
+                </div>
+                <div class="footer-meta">
+                    Sistem Inventaris Kampus • v1.0.0
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dark mode support untuk login page
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 
 </html>

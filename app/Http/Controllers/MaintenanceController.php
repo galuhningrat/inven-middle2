@@ -76,4 +76,10 @@ class MaintenanceController extends Controller
         return redirect()->route('maintenances.index')
             ->with('success', 'Catatan pemeliharaan berhasil dihapus!');
     }
+
+    public function showAssetDetail($id)
+    {
+        $asset = Asset::findOrFail($id);
+        return view('maintenances.asset-detail', compact('asset'));
+    }
 }

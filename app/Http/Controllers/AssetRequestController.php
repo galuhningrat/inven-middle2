@@ -50,10 +50,10 @@ class AssetRequestController extends Controller
             ->with('success', 'Pengajuan berhasil dikirim!');
     }
 
-    public function show(AssetRequest $request)
+    public function show(AssetRequest $assetRequest)
     {
-        $request->load('requester', 'assetType', 'approver');
-        return view('requests.show', compact('request'));
+        $assetRequest->load('requester', 'assetType', 'approver');
+        return view('requests.show', compact('assetRequest'));
     }
 
     public function approve(AssetRequest $assetRequest)

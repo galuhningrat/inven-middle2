@@ -7,6 +7,7 @@
 <div class="data-table-container">
     <div class="table-header">
         <h3 class="table-title">Edit Pengguna: {{ $user->name }}</h3>
+        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-secondary">Edit</a>
         <a href="{{ route('users.index') }}" class="btn btn-secondary">← Kembali</a>
     </div>
     <div style="padding: 2rem;">
