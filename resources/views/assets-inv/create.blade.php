@@ -7,10 +7,10 @@
     <div class="data-table-container">
         <div class="table-header">
             <h3 class="table-title">Tambah Aset Baru</h3>
-            <a href="{{ route('assets.index') }}" class="btn btn-secondary">← Kembali</a>
+            <a href="{{ route('assets-inv.index') }}" class="btn btn-secondary">← Kembali</a>
         </div>
         <div style="padding: 2rem;">
-            <form action="{{ route('assets.store') }}" method="POST" enctype="multipart/form-data" id="assetForm">
+            <form action="{{ route('assets-inv.store') }}" method="POST" enctype="multipart/form-data" id="assetForm">
                 @csrf
 
                 <div class="form-row">
@@ -128,7 +128,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <a href="{{ route('assets.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ route('assets-inv.index') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
@@ -168,7 +168,7 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; height: auto; border-radius: 8px;">`;
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; height: auto; border-radius: 8px; margin-top: 1rem;">`;
                 }
                 reader.readAsDataURL(input.files[0]);
             } else {

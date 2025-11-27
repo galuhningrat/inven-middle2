@@ -5,17 +5,19 @@
 
 @section('content')
     <div class="data-table-container">
-        <div class="table-header">
-            <h3 class="table-title">Edit Aset: {{ $asset->name }}</h3>
-            <a href="{{ route('assets.index') }}" class="btn btn-secondary">← Kembali</a>
+        <div class="table-header" style="flex-wrap: wrap; gap: 1rem;">
+            <h3 class="table-title" style="flex: 1; min-width: 200px;">Edit Aset: {{ $asset->name }}</h3>
+            <a href="{{ route('assets-inv.index') }}" class="btn btn-secondary">← Kembali</a>
         </div>
-        <div style="padding: 2rem;">
-            <form action="{{ route('assets.update', $asset) }}" method="POST" enctype="multipart/form-data">
+        <div style="padding: 1rem;">
+            <form action="{{ route('assets-inv.update', $asset) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <div class="form-row">
-                    <div class="form-group">
+                <!-- Nama Aset & Jenis Aset -->
+                <div class="form-row"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="name">Nama Aset <span style="color: red;">*</span></label>
                         <input type="text" id="name" name="name" class="form-control @error('name') error @enderror"
                             value="{{ old('name', $asset->name) }}" required>
@@ -23,7 +25,7 @@
                             <div class="error-message" style="display: block;">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="asset_type_id">Jenis Aset <span style="color: red;">*</span></label>
                         <select id="asset_type_id" name="asset_type_id"
                             class="form-control @error('asset_type_id') error @enderror" required>
@@ -40,8 +42,10 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
+                <!-- Merek & Nomor Seri -->
+                <div class="form-row"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="brand">Merek <span style="color: red;">*</span></label>
                         <input type="text" id="brand" name="brand" class="form-control @error('brand') error @enderror"
                             value="{{ old('brand', $asset->brand) }}" required>
@@ -49,7 +53,7 @@
                             <div class="error-message" style="display: block;">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="serial_number">Nomor Seri/Kode Unik <span style="color: red;">*</span></label>
                         <input type="text" id="serial_number" name="serial_number"
                             class="form-control @error('serial_number') error @enderror"
@@ -60,8 +64,10 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
+                <!-- Harga & Tanggal Pembelian -->
+                <div class="form-row"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="price">Harga Pembelian <span style="color: red;">*</span></label>
                         <input type="number" id="price" name="price" class="form-control @error('price') error @enderror"
                             value="{{ old('price', $asset->price) }}" min="0" required>
@@ -69,7 +75,7 @@
                             <div class="error-message" style="display: block;">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="purchase_date">Tanggal Pembelian <span style="color: red;">*</span></label>
                         <input type="date" id="purchase_date" name="purchase_date"
                             class="form-control @error('purchase_date') error @enderror"
@@ -80,8 +86,10 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
+                <!-- Lokasi & Kondisi -->
+                <div class="form-row"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="location">Lokasi <span style="color: red;">*</span></label>
                         <select id="location" name="location" class="form-control @error('location') error @enderror"
                             required>
@@ -96,7 +104,7 @@
                             <div class="error-message" style="display: block;">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="condition">Kondisi <span style="color: red;">*</span></label>
                         <select id="condition" name="condition" class="form-control @error('condition') error @enderror"
                             required>
@@ -112,13 +120,15 @@
                     </div>
                 </div>
 
+                <!-- Gambar Aset -->
                 <div class="form-group">
                     <label for="image">Gambar Aset</label>
                     @if($asset->image)
                         <div style="margin-bottom: 1rem;">
                             <img src="{{ Storage::url($asset->image) }}" alt="{{ $asset->name }}"
                                 style="max-width: 200px; border-radius: 8px;">
-                            <p style="font-size: 0.875rem; color: var(--text-secondary);">Gambar saat ini</p>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">Gambar saat ini
+                            </p>
                         </div>
                     @endif
                     <input type="file" id="image" name="image" class="form-control" accept="image/*"
@@ -130,8 +140,9 @@
                     @enderror
                 </div>
 
-                <div class="btn-group">
-                    <a href="{{ route('assets.index') }}" class="btn btn-secondary">Batal</a>
+                <!-- Tombol Aksi -->
+                <div class="btn-group" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <a href="{{ route('assets-inv.index') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-success">Update</button>
                 </div>
             </form>
@@ -155,3 +166,33 @@
         }
     </script>
 @endpush
+
+<style>
+    /* Responsive adjustments for Edit Aset */
+    @media (max-width: 768px) {
+        .data-table-container {
+            margin: 0.5rem;
+        }
+
+        .table-header {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+
+        .table-title {
+            font-size: 1.1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr !important;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-group .btn {
+            width: 100%;
+        }
+    }
+</style>

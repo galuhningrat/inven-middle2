@@ -58,7 +58,8 @@
                     <a href="{{ route('assets-inv.index') }}"
                         class="nav-link {{ request()->routeIs('assets-inv.*') ? 'active' : '' }}" data-page="assets">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                             <polyline points="3.27,6.96 12,12.01 20.73,6.96" />
                             <line x1="12" y1="22.08" x2="12" y2="12" />
                         </svg>
@@ -80,7 +81,8 @@
                     <a href="{{ route('maintenances.index') }}"
                         class="nav-link {{ request()->routeIs('maintenances.*') ? 'active' : '' }}" data-page="maintenance">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                         </svg>
                         <span>Pemeliharaan</span>
                     </a>
@@ -160,7 +162,8 @@
                     <span class="navbar-brand" id="pageTitle">@yield('page-title', 'Dashboard')</span>
                 </div>
                 <div class="navbar-nav">
-                    <button class="btn btn-secondary" onclick="toggleDarkMode()" id="darkModeBtn" aria-label="Toggle Dark Mode">
+                    <button class="btn btn-secondary" onclick="toggleDarkMode()" id="darkModeBtn"
+                        aria-label="Toggle Dark Mode">
                         <span id="darkModeToggleIcon">🌙</span>
                     </button>
                     <div class="user-profile">
@@ -182,13 +185,15 @@
             <div class="content-area">
                 <!-- Flash Messages -->
                 @if(session('success'))
-                    <div class="alert alert-success" id="flashMessage" style="margin-bottom: 1rem; padding: 1rem; background: #d1fae5; color: #065f46; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <div class="alert alert-success" id="flashMessage"
+                        style="margin-bottom: 1rem; padding: 1rem; background: #d1fae5; color: #065f46; border-radius: 8px; border-left: 4px solid #10b981;">
                         {{ session('success') }}
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-error" id="flashMessage" style="margin-bottom: 1rem; padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; border-left: 4px solid #ef4444;">
+                    <div class="alert alert-error" id="flashMessage"
+                        style="margin-bottom: 1rem; padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; border-left: 4px solid #ef4444;">
                         {{ session('error') }}
                     </div>
                 @endif
@@ -208,7 +213,8 @@
                             </div>
                         </div>
                         <p class="footer-description">
-                            Sistem manajemen inventaris terintegrasi untuk pengelolaan aset kampus yang efisien dan modern.
+                            Sistem manajemen inventaris terintegrasi untuk pengelolaan aset kampus yang efisien dan
+                            modern.
                         </p>
                     </div>
 
@@ -403,10 +409,28 @@
 
         function updateServerTime() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('id-ID');
+
+            // Format waktu: HH.mm.ss
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}.${minutes}.${seconds}`;
+
+            // Format tanggal: Day, dd Mon yyyy
+            const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+            const dayName = days[now.getDay()];
+            const day = String(now.getDate()).padStart(2, '0');
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+
+            const dateString = `${dayName}, ${day} ${monthName} ${year}`;
+
+            // Gabungkan: HH.mm.ss • Day, dd Mon yyyy
             const element = document.getElementById('footerServerTime');
             if (element) {
-                element.textContent = timeString;
+                element.textContent = `${timeString} • ${dateString}`;
             }
         }
 

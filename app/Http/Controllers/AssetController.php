@@ -8,7 +8,6 @@ use App\Models\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class AssetController extends Controller
 {
@@ -17,7 +16,7 @@ class AssetController extends Controller
         $query = Asset::with('assetType');
 
         // Search
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('asset_id', 'ILIKE', "%{$search}%")
@@ -29,36 +28,31 @@ class AssetController extends Controller
         }
 
         // Filter by status
-        if ($request->has('status') && $request->status) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Filter by type
-        if ($request->has('type') && $request->type) {
+        if ($request->filled('type')) {
             $query->whereHas('assetType', function ($q) use ($request) {
                 $q->where('code', $request->type);
             });
         }
 
-        $assets = $query->latest()->paginate(10);
+        // Get all assets (NO PAGINATION - as requested)
+        $assets = $query->orderBy('created_at', 'desc')->get();
         $assetTypes = AssetType::all();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'html' => view('assets-inv._table', compact('assets'))->render(),
-                // 'pagination' => $assets->links()->render()
-            ]);
-        }
-
         return view('assets-inv.index', compact('assets', 'assetTypes'));
-        // return view('assets-inv.index');
     }
 
     public function create()
     {
         $assetTypes = AssetType::all();
         $locations = ['Ruang IT', 'Laboratorium', 'Perpustakaan', 'Aula', 'Ruang Dosen'];
-        return view('assets.create', compact('assetTypes', 'locations'));
+
+        // PERBAIKAN: Ganti dari 'assets.create' ke 'assets-inv.create'
+        return view('assets-inv.create', compact('assetTypes', 'locations'));
     }
 
     public function store(Request $request)
@@ -74,6 +68,19 @@ class AssetController extends Controller
             'condition' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Generate Asset ID
+        $assetType = AssetType::find($request->asset_type_id);
+        $year = date('Y');
+        $month = date('m');
+        $lastAsset = Asset::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->where('asset_type_id', $request->asset_type_id)
+            ->latest()
+            ->first();
+
+        $counter = $lastAsset ? intval(substr($lastAsset->asset_id, -4)) + 1 : 1;
+        $validated['asset_id'] = sprintf('%s/%s/%s-%04d', $year, $month, $assetType->code, $counter);
 
         // Generate QR Code
         $qrCode = $this->generateUniqueCode($request->asset_type_id);
@@ -95,21 +102,36 @@ class AssetController extends Controller
             'status' => 'Aktif',
         ]);
 
-        return redirect()->route('assets.index')
+        return redirect()->route('assets-inv.index')
             ->with('success', 'Aset berhasil ditambahkan!');
     }
 
     public function show(Asset $asset)
     {
-        $asset->load('assetType', 'qrCode', 'borrowings', 'maintenances');
-        return view('assets.show', compact('asset'));
+        // Load relations dengan safe check
+        $asset->load([
+            'assetType',
+            'qrCodes' => function ($query) {
+                $query->latest();
+            },
+            'borrowings' => function ($query) {
+                $query->latest()->limit(10);
+            },
+            'maintenances' => function ($query) {
+                $query->latest()->limit(10);
+            }
+        ]);
+
+        return view('assets-inv.show', compact('asset'));
     }
 
     public function edit(Asset $asset)
     {
         $assetTypes = AssetType::all();
         $locations = ['Ruang IT', 'Laboratorium', 'Perpustakaan', 'Aula', 'Ruang Dosen'];
-        return view('assets.edit', compact('asset', 'assetTypes', 'locations'));
+
+        // PERBAIKAN: Ganti dari 'assets.edit' ke 'assets-inv.edit'
+        return view('assets-inv.edit', compact('asset', 'assetTypes', 'locations'));
     }
 
     public function update(Request $request, Asset $asset)
@@ -129,7 +151,7 @@ class AssetController extends Controller
         // Handle image upload
         if ($request->hasFile('image')) {
             // Delete old image
-            if ($asset->image) {
+            if ($asset->image && Storage::disk('public')->exists($asset->image)) {
                 Storage::disk('public')->delete($asset->image);
             }
             $imagePath = $request->file('image')->store('assets', 'public');
@@ -138,24 +160,29 @@ class AssetController extends Controller
 
         $asset->update($validated);
 
-        return redirect()->route('assets.index')
+        return redirect()->route('assets-inv.index')
             ->with('success', 'Aset berhasil diupdate!');
     }
 
     public function destroy(Asset $asset)
     {
-        // Delete image
-        if ($asset->image) {
-            Storage::disk('public')->delete($asset->image);
+        try {
+            // Delete image
+            if ($asset->image && Storage::disk('public')->exists($asset->image)) {
+                Storage::disk('public')->delete($asset->image);
+            }
+
+            // Delete related QR codes
+            $asset->qrCodes()->delete();
+
+            $asset->delete();
+
+            return redirect()->route('assets-inv.index')
+                ->with('success', 'Aset berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->route('assets-inv.index')
+                ->with('error', 'Gagal menghapus aset: ' . $e->getMessage());
         }
-
-        // Delete related QR codes
-        $asset->qrCode()->delete();
-
-        $asset->delete();
-
-        return redirect()->route('assets.index')
-            ->with('success', 'Aset berhasil dihapus!');
     }
 
     public function generateQrCode(Request $request)
@@ -177,50 +204,31 @@ class AssetController extends Controller
 
     public function bulkDelete(Request $request)
     {
-        $ids = $request->ids;
+        try {
+            $ids = $request->ids;
+            $deleted = 0;
 
-        foreach ($ids as $id) {
-            $asset = Asset::find($id);
-            if ($asset) {
-                if ($asset->image) {
-                    Storage::disk('public')->delete($asset->image);
+            foreach ($ids as $id) {
+                $asset = Asset::find($id);
+                if ($asset) {
+                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
+                        Storage::disk('public')->delete($asset->image);
+                    }
+                    $asset->qrCodes()->delete();
+                    $asset->delete();
+                    $deleted++;
                 }
-                $asset->qrCode()->delete();
-                $asset->delete();
             }
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$deleted} aset berhasil dihapus."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus aset: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['success' => true, 'message' => count($ids) . ' aset berhasil dihapus.']);
     }
-
-    public function export(Request $request)
-    {
-        $format = $request->format ?? 'excel';
-        $ids = $request->ids;
-
-        $query = Asset::with('assetType');
-
-        if ($ids) {
-            $query->whereIn('id', $ids);
-        }
-
-        $assets = $query->get();
-
-        // if ($format === 'pdf') {
-        //     return $this->exportPdf($assets);
-        // }
-
-        // return $this->exportExcel($assets);
-    }
-
-    // private function exportPdf($assets)
-    // {
-    //     $pdf = \PDF::loadView('exports.assets-pdf', compact('assets'));
-    //     return $pdf->download('laporan-aset.pdf');
-    // }
-
-    // private function exportExcel($assets)
-    // {
-    //     return \Excel::download(new \App\Exports\AssetsExport($assets), 'laporan-aset.xlsx');
-    // }
 }

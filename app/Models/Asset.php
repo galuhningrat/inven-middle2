@@ -30,6 +30,40 @@ class Asset extends Model
         'price' => 'decimal:2',
     ];
 
+    // ✅ PERBAIKAN: Tambahkan relasi qrCodes (plural)
+    // Tambahkan relasi ini:
+    public function qrCodes()
+    {
+        return $this->hasMany(QrCode::class, 'asset_id');
+    }
+
+    // public function qrCode()
+    // {
+    //     return $this->hasOne(QrCode::class, 'asset_id');
+    // }
+
+    // // ✅ ALTERNATIF: Jika ingin singular, tambahkan juga qrCode
+    // public function qrCode()
+    // {
+    //     return $this->hasOne(QrCode::class, 'asset_id');
+    // }
+
+    // public function assetType()
+    // {
+    //     return $this->belongsTo(AssetType::class, 'asset_type_id');
+    // }
+
+    // public function borrowings()
+    // {
+    //     return $this->hasMany(Borrowing::class, 'asset_id');
+    // }
+
+    // public function maintenances()
+    // {
+    //     return $this->hasMany(Maintenance::class, 'asset_id');
+    // }
+
+    //
     protected static function boot()
     {
         parent::boot();
